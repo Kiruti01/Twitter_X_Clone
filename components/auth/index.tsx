@@ -1,19 +1,22 @@
 "use client";
+
 import Image from "next/image";
 import React, { useCallback } from "react";
 import Button from "../ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { AiFillGithub } from "react-icons/ai";
-
 import useRegisterModal from "@/hooks/useRegisterModal";
 import RegisterModal from "../modals/registerModal";
-
 import useLoginModal from "@/hooks/useLoginModal";
 import LoginModal from "../modals/loginModal";
+import { signIn, useSession } from "next-auth/react";
 
 export default function Auth() {
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
+
+  const { data } = useSession();
+  console.log(data);
 
   const onOpenRegisterModal = useCallback(() => {
     registerModal.onOpen();
@@ -22,6 +25,7 @@ export default function Auth() {
   const onOpenLoginModal = useCallback(() => {
     loginModal.onOpen();
   }, [loginModal]);
+
   return (
     <>
       <RegisterModal />
@@ -29,33 +33,37 @@ export default function Auth() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center h-screen">
         <Image
           src={"/images/x.svg"}
-          alt="x"
+          alt="X"
           width={450}
           height={450}
-          className=" justify-self-center hidden md:block"
+          className="justify-self-center hidden md:block"
         />
 
         <div className="flex flex-col justify-center md:justify-between gap-6 h-full md:h-[70vh]">
           <div className="block md:hidden">
-            <Image src={"/images/x.svg"} alt="x" width={50} height={50} />
+            <Image src={"/images/x.svg"} alt="X" width={50} height={50} />
           </div>
-          <h1 className=" text-6xl font-bold">Happening now</h1>
+          <h1 className="text-6xl font-bold">Happening now</h1>
           <div className="w-full md:w-[60%]">
-            <h2 className=" font-bold text-3xl mb-4">Join today.</h2>
+            <h2 className="font-bold text-3xl mb-4">Join today.</h2>
             <div className="flex flex-col space-y-2">
               <Button
+                onClick={() => signIn("google")}
                 label={
                   <div className="flex gap-2 items-center justify-center">
-                    <FcGoogle /> Sign Up with Google
+                    <FcGoogle />
+                    Sign up with Google
                   </div>
                 }
                 fullWidth
                 secondary
               />
               <Button
+                onClick={() => signIn("github")}
                 label={
                   <div className="flex gap-2 items-center justify-center">
-                    <AiFillGithub /> Sign Up with Github
+                    <AiFillGithub />
+                    Sign up with Github
                   </div>
                 }
                 fullWidth

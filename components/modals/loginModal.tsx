@@ -1,3 +1,4 @@
+"use client";
 import React, { useCallback, useState } from "react";
 import Modal from "../ui/modal";
 import useLoginModal from "@/hooks/useLoginModal";
@@ -14,12 +15,15 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle } from "lucide-react";
-// import { Alert, AlertTitle, AlertDescription } from "../ui/alert";
+import { Alert, AlertTitle, AlertDescription } from "../ui/alert";
 import { loginSchema } from "@/lib/validation";
 import useRegisterModal from "@/hooks/useRegisterModal";
+import axios from "axios";
+import { signIn } from "next-auth/react";
 
 export default function LoginModal() {
   const [error, setError] = useState("");
+
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
 
@@ -36,18 +40,34 @@ export default function LoginModal() {
     },
   });
 
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    try {
+      const { data } = await axios.post("/api/auth/login", values);
+      if (data.success) {
+        signIn("credentials", values);
+        loginModal.onClose();
+      }
+    } catch (error: any) {
+      if (error.response.data.error) {
+        setError(error.response.data.error);
+      } else {
+        setError("Something went wrong. Please try again later.");
+      }
+    }
+  }
+
   const { isSubmitting } = form.formState;
 
   const bodyContent = (
     <Form {...form}>
       <form className="space-y-4 px-12">
-        {/* {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )} */}
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
         <FormField
           control={form.control}
           name="email"

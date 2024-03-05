@@ -1,7 +1,7 @@
 "use client";
+
 import useRegisterModal from "@/hooks/useRegisterModal";
 import Modal from "../ui/modal";
-import { X } from "lucide-react";
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -14,9 +14,14 @@ import {
   FormItem,
   FormMessage,
 } from "../ui/form";
-import Button from "../ui/button";
 import { Input } from "../ui/input";
+import Button from "../ui/button";
 import useLoginModal from "@/hooks/useLoginModal";
+import axios from "axios";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { AlertCircle } from "lucide-react";
+import error from "next/error";
+import { signIn } from "next-auth/react";
 
 export default function RegisterModal() {
   const [step, setStep] = useState(1);
@@ -70,6 +75,8 @@ function RegisterStep1({
   setData: Dispatch<SetStateAction<{ name: string; email: string }>>;
   setStep: Dispatch<SetStateAction<number>>;
 }) {
+  const [error, setError] = useState("");
+
   const form = useForm<z.infer<typeof registerStep1Schema>>({
     resolver: zodResolver(registerStep1Schema),
     defaultValues: {
@@ -78,19 +85,34 @@ function RegisterStep1({
     },
   });
 
-  function onSubmit(values: z.infer<typeof registerStep1Schema>) {
-    setData(values);
-    setStep(2);
+  async function onSubmit(values: z.infer<typeof registerStep1Schema>) {
+    try {
+      const { data } = await axios.post("/api/auth/register?step=1", values);
+      if (data.success) {
+        setData(values);
+        setStep(2);
+      }
+    } catch (error: any) {
+      if (error.response.data.error) {
+        setError(error.response.data.error);
+      } else {
+        setError("Something went wrong. Please try again later.");
+      }
+    }
   }
+
   const { isSubmitting } = form.formState;
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-12">
-        <h3 className="text-3xl font-semibold text-white">
-          {" "}
-          Create an account
-        </h3>
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
         <FormField
           control={form.control}
           name="name"
@@ -99,7 +121,6 @@ function RegisterStep1({
               <FormControl>
                 <Input placeholder="Name" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
@@ -112,7 +133,6 @@ function RegisterStep1({
               <FormControl>
                 <Input placeholder="Email" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
@@ -131,6 +151,7 @@ function RegisterStep1({
 }
 
 function RegisterStep2({ data }: { data: { name: string; email: string } }) {
+  const [error, setError] = useState("");
   const registerModal = useRegisterModal();
 
   const form = useForm<z.infer<typeof registerStep2Schema>>({
@@ -140,12 +161,40 @@ function RegisterStep2({ data }: { data: { name: string; email: string } }) {
       username: "",
     },
   });
-  function onSubmit(values: z.infer<typeof registerStep2Schema>) {}
-  const { isSubmitting } = form.formState;
 
+  async function onSubmit(values: z.infer<typeof registerStep2Schema>) {
+    try {
+      const { data: response } = await axios.post("/api/auth/register?step=2", {
+        ...data,
+        ...values,
+      });
+      if (response.success) {
+        signIn("credentials", {
+          email: data.email,
+          password: values.password,
+        });
+        registerModal.onClose();
+      }
+    } catch (error: any) {
+      if (error.response.data.error) {
+        setError(error.response.data.error);
+      } else {
+        setError("Something went wrong. Please try again later.");
+      }
+    }
+  }
+
+  const { isSubmitting } = form.formState;
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-12">
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
         <FormField
           control={form.control}
           name="username"
@@ -154,7 +203,6 @@ function RegisterStep2({ data }: { data: { name: string; email: string } }) {
               <FormControl>
                 <Input placeholder="Username" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
@@ -167,7 +215,6 @@ function RegisterStep2({ data }: { data: { name: string; email: string } }) {
               <FormControl>
                 <Input placeholder="Password" type="password" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
