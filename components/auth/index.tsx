@@ -57,6 +57,7 @@ export default function Auth() {
                 }
                 fullWidth
                 secondary
+                classNames={""}
               />
               <Button
                 onClick={() => signIn("github")}
@@ -68,6 +69,7 @@ export default function Auth() {
                 }
                 fullWidth
                 secondary
+                classNames={""}
               />
               <div className="flex items-center justify-center">
                 <div className="h-px bg-gray-700 w-1/2" />
@@ -78,6 +80,7 @@ export default function Auth() {
                 label={"Create account"}
                 fullWidth
                 onClick={onOpenRegisterModal}
+                classNames={""}
               />
               <div className="text-[10px] text-gray-400">
                 By signing up, you agree to the{" "}
@@ -96,6 +99,7 @@ export default function Auth() {
               fullWidth
               outline
               onClick={onOpenLoginModal}
+              classNames={""}
             />
           </div>
         </div>
