@@ -12,6 +12,7 @@ interface ModalProps {
   footer?: ReactElement;
   step?: number;
   totalSteps?: number;
+  isEditing?: boolean;
 }
 
 export default function Modal({
@@ -21,6 +22,7 @@ export default function Modal({
   onClose,
   step,
   totalSteps,
+  isEditing,
 }: ModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

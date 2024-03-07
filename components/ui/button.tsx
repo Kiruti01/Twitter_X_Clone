@@ -10,6 +10,7 @@ interface ButtonProps {
   outline?: boolean;
   type?: "button" | "submit";
   onClick?: () => void;
+  classNames: string;
 }
 
 export default function Button({
