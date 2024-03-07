@@ -144,6 +144,7 @@ function RegisterStep1({
           fullWidth
           large
           disabled={isSubmitting}
+          classNames={""}
         />
       </form>
     </Form>
@@ -226,6 +227,7 @@ function RegisterStep2({ data }: { data: { name: string; email: string } }) {
           fullWidth
           large
           disabled={isSubmitting}
+          classNames={""}
         />
       </form>
     </Form>

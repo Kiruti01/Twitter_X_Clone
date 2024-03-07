@@ -99,6 +99,7 @@ export default function LoginModal() {
           fullWidth
           large
           disabled={isSubmitting}
+          classNames={""}
         />
       </form>
     </Form>
