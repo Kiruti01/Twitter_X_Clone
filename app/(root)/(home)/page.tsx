@@ -1,5 +1,6 @@
 "use client";
 
+//imports
 import Form from "@/components/shared/form";
 import Header from "@/components/shared/header";
 import PostItem from "@/components/shared/post-item";
@@ -10,6 +11,7 @@ import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
+//export
 export default function Page() {
   const { data: session, status }: any = useSession();
   const { data, isLoading } = usePosts();

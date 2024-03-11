@@ -1,5 +1,5 @@
 "use client";
-
+//imports
 import { IPost, IUser } from "@/types";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
